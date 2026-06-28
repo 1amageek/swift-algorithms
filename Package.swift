@@ -10,24 +10,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-import Foundation
 import PackageDescription
-
-let manifestDirectoryURL = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
-let manifestPath = manifestDirectoryURL.standardizedFileURL.path
-let isDependencyCheckout = manifestPath.contains("/.build/checkouts/")
-  || manifestPath.contains("/SourcePackages/checkouts/")
-
-func localOrForkDependency(_ repository: String, localPath: String) -> Package.Dependency {
-  let resolvedLocalPath = URL(fileURLWithPath: localPath, relativeTo: manifestDirectoryURL)
-    .standardizedFileURL
-    .path
-  if !isDependencyCheckout && FileManager.default.fileExists(atPath: resolvedLocalPath) {
-    return .package(path: resolvedLocalPath)
-  }
-
-  return .package(url: "https://github.com/1amageek/\(repository).git", branch: "main")
-}
 
 let package = Package(
   name: "swift-algorithms",
@@ -37,7 +20,7 @@ let package = Package(
       targets: ["Algorithms"])
   ],
   dependencies: [
-    localOrForkDependency("swift-numerics", localPath: "../swift-numerics")
+    .package(url: "https://github.com/1amageek/swift-numerics.git", branch: "main")
   ],
   targets: [
     .target(
