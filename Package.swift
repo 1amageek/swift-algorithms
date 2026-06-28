@@ -10,7 +10,21 @@
 //
 //===----------------------------------------------------------------------===//
 
+import Foundation
 import PackageDescription
+
+let manifestDirectoryURL = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+
+func localOrForkDependency(_ repository: String, localPath: String) -> Package.Dependency {
+  let resolvedLocalPath = URL(fileURLWithPath: localPath, relativeTo: manifestDirectoryURL)
+    .standardizedFileURL
+    .path
+  if FileManager.default.fileExists(atPath: resolvedLocalPath) {
+    return .package(path: resolvedLocalPath)
+  }
+
+  return .package(url: "https://github.com/1amageek/\(repository).git", branch: "main")
+}
 
 let package = Package(
   name: "swift-algorithms",
@@ -20,7 +34,7 @@ let package = Package(
       targets: ["Algorithms"])
   ],
   dependencies: [
-    .package(url: "https://github.com/apple/swift-numerics.git", from: "1.0.0")
+    localOrForkDependency("swift-numerics", localPath: "../swift-numerics")
   ],
   targets: [
     .target(
